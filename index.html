@@ -2,41 +2,242 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Cosa direbbe...?</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cosa direbbe...? - Party Game Avanzato</title>
+  <style>
+    body {
+      background-color: #0b2e0b;
+      color: #a8f0a8;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+    h1 {
+      margin-bottom: 10px;
+      color: #7fca7f;
+      text-align: center;
+    }
+    input, button {
+      font-size: 1.1em;
+      padding: 10px;
+      border-radius: 5px;
+      border: none;
+      margin: 5px;
+    }
+    input {
+      width: 80%;
+      max-width: 400px;
+    }
+    button {
+      background-color: #4caf50;
+      color: #0b2e0b;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      font-weight: bold;
+    }
+    button:hover {
+      background-color: #388e3c;
+    }
+    #question {
+      margin: 20px 0 10px;
+      font-size: 1.4em;
+      min-height: 60px;
+      text-align: center;
+    }
+    #chosenName {
+      font-size: 1.3em;
+      margin: 8px 0 15px;
+      color: #c0ffc0;
+      user-select: none;
+      cursor: pointer;
+      background: #1a4e1a;
+      border-radius: 6px;
+      padding: 8px 12px;
+      width: fit-content;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    #votesSection {
+      margin-top: 20px;
+      width: 100%;
+      max-width: 450px;
+      background: #153915;
+      border-radius: 8px;
+      padding: 15px;
+    }
+    .playerVote {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 8px 0;
+    }
+    .playerName {
+      font-weight: 600;
+    }
+    .voteButtons button {
+      background-color: #2e7d32;
+      color: #a8f0a8;
+      margin-left: 5px;
+      padding: 5px 12px;
+      border-radius: 4px;
+      font-size: 1em;
+      font-weight: 600;
+    }
+    .voteButtons button:hover {
+      background-color: #1b4d1b;
+    }
+    #scores {
+      margin-top: 25px;
+      font-weight: 700;
+      font-size: 1.2em;
+      text-align: center;
+      white-space: pre-line;
+    }
+    #history {
+      margin-top: 20px;
+      max-width: 450px;
+      background: #204220;
+      border-radius: 8px;
+      padding: 10px 15px;
+      font-size: 0.95em;
+      color: #b0ddb0;
+      max-height: 130px;
+      overflow-y: auto;
+    }
+    #finalMessage {
+      margin-top: 25px;
+      font-size: 1.3em;
+      color: #7ff57f;
+      text-align: center;
+      font-weight: 700;
+    }
+    #resetBtn {
+      margin-top: 15px;
+      background-color: #7cbb7c;
+      color: #0b2e0b;
+      font-weight: 700;
+    }
+    footer {
+      margin-top: auto;
+      font-size: 0.85em;
+      color: #5c8a5c;
+    }
+  </style>
 </head>
 <body>
-  <h1>Benvenuti a "Cosa direbbe...?"</h1>
-  <p>Scrivi i nomi dei giocatori e premi "Inizia".</p>
-  <input type="text" id="players" placeholder="Mario, Luca, Anna..." size="40" />
-  <button onclick="startGame()">Inizia</button>
-  <h2 id="question" style="margin-top: 30px;"></h2>
+  <h1>Cosa direbbe...? - Party Game Avanzato</h1>
+  <p>Inserisci i nomi dei giocatori separati da virgole e premi "Inizia".</p>
+  <input type="text" id="playersInput" placeholder="Mario, Luca, Anna..." autocomplete="off" />
+  <button id="startBtn">Inizia</button>
 
-  <script>
-    const prompts = [
-      "Cosa direbbe {nome} se trovasse 100€ per terra?",
-      "Cosa direbbe {nome} durante un litigio?",
-      "Cosa direbbe {nome} se venisse arrestato?",
-      "Cosa direbbe {nome} ad un colloquio di lavoro?",
-      "Cosa direbbe {nome} dopo una notte brava?",
-      "Cosa direbbe {nome} se vincesse alla lotteria?",
-      "Cosa direbbe {nome} se venisse tradito?",
-      "Cosa direbbe {nome} se fosse ubriaco?",
-      "Cosa direbbe {nome} alla sua versione del passato?",
-      "Cosa direbbe {nome} davanti a un fantasma?"
-    ];
+  <div id="gameArea" style="display:none; width: 100%; max-width: 450px;">
+    <div id="chosenName" title="Clicca per mostrare/nascondere il nome">[Clicca per mostrare il nome]</div>
+    <div id="question"></div>
+    <button id="newQuestionBtn" style="margin-top: 15px;">Nuova domanda</button>
 
-    function startGame() {
-      const input = document.getElementById("players").value;
-      const nomi = input.split(",").map(n => n.trim()).filter(n => n.length > 0);
-      if (nomi.length === 0) {
-        alert("Inserisci almeno un nome!");
-        return;
-      }
-      const nome = nomi[Math.floor(Math.random() * nomi.length)];
-      const frase = prompts[Math.floor(Math.random() * prompts.length)];
-      document.getElementById("question").textContent = frase.replace("{nome}", nome);
+    <div id="votesSection" style="display:none;">
+      <h3>Vota i giocatori</h3>
+      <div id="votesContainer"></div>
+      <div id="scores"></div>
+    </div>
+
+    <div id="history" title="Ultime 5 domande fatte"></div>
+    <div id="finalMessage"></div>
+    <button id="resetBtn" style="display:none;">Reset Gioco</button>
+  </div>
+
+  <footer>
+    Creato con ❤️ dal tuo assistente ChatGPT
+  </footer>
+
+<script>
+  const normalPrompts = [
+    "Cosa direbbe {nome} se trovasse 100€ per terra?",
+    "Cosa direbbe {nome} durante un litigio?",
+    "Cosa direbbe {nome} se venisse arrestato?",
+    "Cosa direbbe {nome} ad un colloquio di lavoro?",
+    "Cosa direbbe {nome} dopo una notte brava?",
+    "Cosa direbbe {nome} se vincesse alla lotteria?",
+    "Cosa direbbe {nome} se venisse tradito?",
+    "Cosa direbbe {nome} se fosse ubriaco?",
+    "Cosa direbbe {nome} davanti a un fantasma?",
+    "Cosa direbbe {nome} se avesse vinto un premio importante?"
+  ];
+
+  const hardPrompts = [
+    "Cosa direbbe {nome} se fosse il capo del mondo per un giorno?",
+    "Cosa direbbe {nome} se incontrasse un alieno?",
+    "Cosa direbbe {nome} se dovesse affrontare un drago?",
+    "Cosa direbbe {nome} se vincesse una gara di ballo?",
+    "Cosa direbbe {nome} se fosse un personaggio di un film horror?",
+    "Cosa direbbe {nome} se fosse intrappolato in un videogioco?",
+    "Cosa direbbe {nome} se fosse un supereroe con un potere inutile?",
+    "Cosa direbbe {nome} se dovesse cantare davanti a una folla enorme?"
+  ];
+
+  const allPrompts = normalPrompts.concat(hardPrompts);
+
+  let players = [];
+  let scores = {};
+  let currentName = '';
+  let currentQuestion = '';
+  let questionHistory = [];
+  const maxQuestions = 10;
+
+  const playersInput = document.getElementById('playersInput');
+  const startBtn = document.getElementById('startBtn');
+  const gameArea = document.getElementById('gameArea');
+  const chosenNameDiv = document.getElementById('chosenName');
+  const questionDiv = document.getElementById('question');
+  const newQuestionBtn = document.getElementById('newQuestionBtn');
+  const votesSection = document.getElementById('votesSection');
+  const votesContainer = document.getElementById('votesContainer');
+  const scoresDiv = document.getElementById('scores');
+  const historyDiv = document.getElementById('history');
+  const finalMessageDiv = document.getElementById('finalMessage');
+  const resetBtn = document.getElementById('resetBtn');
+
+  // Suoni semplici (puoi sostituire con i tuoi file o disattivare)
+  const soundNewQuestion = new Audio("https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg");
+  const soundVote = new Audio("https://actions.google.com/sounds/v1/cartoon/boing.ogg");
+
+  function randomChoice(arr) {
+    return arr[Math.floor(Math.random() * arr.length)];
+  }
+
+  function startGame() {
+    const input = playersInput.value;
+    players = input.split(',').map(p => p.trim()).filter(p => p.length > 0);
+    if(players.length < 2) {
+      alert('Inserisci almeno 2 nomi per giocare!');
+      return;
     }
-  </script>
-</body>
-</html>
+    scores = {};
+    players.forEach(p => scores[p] = 0);
+    playersInput.style.display = 'none';
+    startBtn.style.display = 'none';
+    gameArea.style.display = 'block';
+    votesSection.style.display = 'block';
+    finalMessageDiv.textContent = '';
+    resetBtn.style.display = 'none';
+    questionHistory = [];
+    nextTurn();
+    renderVotes();
+    renderHistory();
+  }
+
+  function nextTurn() {
+    if(questionHistory.length >= maxQuestions) {
+      endGame();
+      return;
+    }
+    currentName = randomChoice(players);
+    currentQuestion = randomChoice(allPrompts).replace('{nome}', currentName);
+    questionHistory.unshift({name: currentName, question: currentQuestion});
+    if(questionHistory.length > 5) questionHistory.pop();
+
+    chosenNameDiv.textContent = "[Clicca per mostrare
