@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Cosa direbbe...?</title>
+</head>
+<body>
+  <h1>Benvenuti a "Cosa direbbe...?"</h1>
+  <p>Scrivi i nomi dei giocatori e premi "Inizia".</p>
+  <input type="text" id="players" placeholder="Mario, Luca, Anna..." size="40" />
+  <button onclick="startGame()">Inizia</button>
+  <h2 id="question" style="margin-top: 30px;"></h2>
+
+  <script>
+    const prompts = [
+      "Cosa direbbe {nome} se trovasse 100€ per terra?",
+      "Cosa direbbe {nome} durante un litigio?",
+      "Cosa direbbe {nome} se venisse arrestato?",
+      "Cosa direbbe {nome} ad un colloquio di lavoro?",
+      "Cosa direbbe {nome} dopo una notte brava?",
+      "Cosa direbbe {nome} se vincesse alla lotteria?",
+      "Cosa direbbe {nome} se venisse tradito?",
+      "Cosa direbbe {nome} se fosse ubriaco?",
+      "Cosa direbbe {nome} alla sua versione del passato?",
+      "Cosa direbbe {nome} davanti a un fantasma?"
+    ];
+
+    function startGame() {
+      const input = document.getElementById("players").value;
+      const nomi = input.split(",").map(n => n.trim()).filter(n => n.length > 0);
+      if (nomi.length === 0) {
+        alert("Inserisci almeno un nome!");
+        return;
+      }
+      const nome = nomi[Math.floor(Math.random() * nomi.length)];
+      const frase = prompts[Math.floor(Math.random() * prompts.length)];
+      document.getElementById("question").textContent = frase.replace("{nome}", nome);
+    }
+  </script>
+</body>
+</html>
